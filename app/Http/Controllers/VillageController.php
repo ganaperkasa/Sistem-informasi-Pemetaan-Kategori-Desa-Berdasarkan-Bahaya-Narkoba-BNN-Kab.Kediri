@@ -16,12 +16,17 @@ class VillageController extends Controller
         ]);
 
     }
-    public function coba()
+    public function coba(Request $request)
     {
+        $tahunTerpilih = $request->get('tahun', date('Y'));
+        $tahunSekarang = date('Y');
+        $tahunList = range(2020, $tahunSekarang);
         return view('admin.maps.desamap', [
             'app' => Application::all(),
             'title' => 'Peta Desa',
-            'desas' => Desa::all(),
+            'desas' => Desa::whereYear('updated_at', $tahunTerpilih)->get(),
+            'tahunList' => array_reverse($tahunList),
+            'tahunTerpilih' => $tahunTerpilih,
         ]);
 
     }

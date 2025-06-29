@@ -4,7 +4,16 @@
         <div class="col-md-12 col-lg-12 order-0 mb-4">
             <div class="card h-1000">
                 <div class="card-body">
-
+                    <div class="d-flex justify-content-end">
+                        <form method="GET" id="filterForm">
+                            <select id="filterTahun" name="tahun" class="form-select mb-4" style="width: 200px;">
+                                @foreach ($tahunList as $tahun)
+                                    <option value="{{ $tahun }}" {{ $tahun == $tahunTerpilih ? 'selected' : '' }}>
+                                        {{ $tahun }}</option>
+                                @endforeach
+                            </select>
+                        </form>
+                    </div>
                     <div id="map"></div>
                     <!-- Make sure you put this AFTER Leaflet's CSS -->
                     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -14,6 +23,9 @@
             </div>
         </div>
         <script>
+            document.getElementById('filterTahun').addEventListener('change', function() {
+                document.getElementById('filterForm').submit();
+            });
             var map = L.map('map').setView([-7.8015312, 111.9448052], 11);
 
             var tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
