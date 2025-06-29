@@ -36,7 +36,7 @@ class VillageController extends Controller
         return view('admin.maps.sosialisasimap', [
             'app' => Application::all(),
             'title' => 'Peta Desa',
-            'desas' => Desa::all(),
+            'desas' => Desa::with('sosialisasis')->get(),
         ]);
 
     }
