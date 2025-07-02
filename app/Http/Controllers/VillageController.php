@@ -45,7 +45,16 @@ class VillageController extends Controller
         return view('admin.maps.golonganmap', [
             'app' => Application::all(),
             'title' => 'Peta Desa',
-            'desas' => Desa::all(),
+            'desas' => Desa::with('kecamatan')->get(),
+        ]);
+
+    }
+    public function all()
+    {
+        return view('admin.maps.allmap', [
+            'app' => Application::all(),
+            'title' => 'Peta Desa',
+            'desas' => Desa::with('kecamatan')->get(),
         ]);
 
     }

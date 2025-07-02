@@ -6,7 +6,6 @@
                 <div class="card-body">
 
                     <div id="map"></div>
-                    <div id="floating-info" style="display: none;"></div>
                     <!-- Make sure you put this AFTER Leaflet's CSS -->
                     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
                         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -33,11 +32,10 @@
                     properties: {
                         name: desa.nama_desa,
                         id: desa.id,
-                        sosialisasi: desa.sosialisasis.length,
-                        detail: desa.sosialisasis.map(s => ({
-                            judul: s.judul,
-                            gambar: s.gambar,
-                        }))
+                        population: desa.population,
+                        sosialisasi: desa.sosialisasi,
+                        golongan_positif: desa.golongan_positif,
+                        kecamatan: desa.kecamatan ? desa.kecamatan.nama_kecamatan : 'Tidak diketahui',
                     },
                     geometry: {
                         type: desa.type_polygon,
@@ -51,13 +49,41 @@
             };
 
             function getColor(d) {
-                return d >= 1 ? '#0000FF' :
-                    '#FF0000';
+                return d >= 11 ? '#000000' : // hitam
+                    d >= 5 ? '#FF0000' : // merah
+                    d >= 1 ? '#FFFF00' : // kuning
+                    '#0B6623'; // hijau
+            }
+
+            function onEachFeature(feature, layer) {
+                const props = feature.properties;
+
+                const popupContent = `
+        <strong>${props.name}</strong><br>
+        Kecamatan: ${props.kecamatan}<br>
+        Jumlah Sosialisasi: ${props.sosialisasi}<br>
+        Jumlah Orang Positif: ${props.population}<br>
+        Jumlah Golongan Positif: ${props.golongan_positif}
+    `;
+
+                layer.bindPopup(popupContent);
+
+                layer.on({
+                    mouseover: function(e) {
+                        highlightFeature(e);
+                        this.openPopup();
+                    },
+                    mouseout: function(e) {
+                        resetHighlight(e);
+                        this.closePopup();
+                    },
+                    click: zoomToFeature
+                });
             }
 
             function style(feature) {
                 return {
-                    fillColor: getColor(feature.properties.sosialisasi),
+                    fillColor: getColor(feature.properties.population),
                     weight: 2,
                     opacity: 1,
                     color: 'white',
@@ -78,49 +104,16 @@
 
                 layer.bringToFront();
                 // info.update(layer.feature.properties);
-                showFloatingInfo(layer.feature.properties);
             }
 
             function resetHighlight(e) {
                 geojson.resetStyle(e.target);
                 // info.update();
-                hideFloatingInfo();
             }
 
             function zoomToFeature(e) {
                 map.fitBounds(e.target.getBounds());
             }
-
-            function onEachFeature(feature, layer) {
-                layer.on({
-                    mouseover: highlightFeature,
-                    mouseout: resetHighlight,
-                    click: zoomToFeature
-                });
-            }
-
-            function showFloatingInfo(props) {
-                const div = document.getElementById('floating-info');
-                let html = `<h4>Sosialisasi Desa</h4><b>${props.name}</b><br />${props.sosialisasi} Sosialisasi`;
-
-                if (props.detail.length > 0) {
-                    html += `<ul style="list-style:none;padding:0;">`;
-                    props.detail.forEach(s => {
-                        html +=
-                            `<li style="margin-bottom:10px;"><b>${s.judul}</b><br/><img src="/storage/${s.gambar}" width="100"/></li>`;
-                    });
-                    html += `</ul>`;
-                }
-
-                div.innerHTML = html;
-                div.style.display = 'block';
-            }
-
-            function hideFloatingInfo() {
-                const div = document.getElementById('floating-info');
-                div.style.display = 'none';
-            }
-
 
             geojson = L.geoJson(geoJson, {
                 style: style,
@@ -136,9 +129,8 @@
             legend.onAdd = function(map) {
 
                 var div = L.DomUtil.create('div', 'info legend'),
-                    grades = [0, 1],
+                    grades = [0, 1, 5, 11],
                     labels = [];
-
 
                 for (var i = 0; i < grades.length; i++) {
                     var from = grades[i];

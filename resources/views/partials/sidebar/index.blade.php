@@ -29,6 +29,11 @@
           <div>Jenis Narkoba</div>
         </a>
       </li>
+      <li class="menu-item {{ Request::routeIs('maps-all.index') ? 'active' : '' }}">
+        <a href="{{ route('maps-all.index') }}" class="menu-link">
+          <div>Ringkasan Peta</div>
+        </a>
+      </li>
     </ul>
   </li>
 
