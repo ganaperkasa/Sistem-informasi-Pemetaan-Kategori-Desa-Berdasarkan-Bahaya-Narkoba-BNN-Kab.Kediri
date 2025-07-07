@@ -134,23 +134,29 @@
             });
 
             legend.onAdd = function(map) {
-
                 var div = L.DomUtil.create('div', 'info legend'),
                     grades = [0, 1, 5, 11],
                     labels = [];
 
-                // loop through our density intervals and generate a label with a colored square for each interval
                 for (var i = 0; i < grades.length; i++) {
                     var from = grades[i];
                     var to = grades[i + 1];
 
-                    div.innerHTML +=
-                        '<i style="background:' + getColor(from) + '"></i> ' +
-                        (to ? from + '&ndash;' + (to - 1) + '<br>' : from + '+');
+                    // Perbaikan untuk menampilkan '0' saja, bukan '0–0'
+                    if (i === 0) {
+                        div.innerHTML +=
+                            '<i style="background:' + getColor(from) + '"></i> ' +
+                            from + '<br>';
+                    } else {
+                        div.innerHTML +=
+                            '<i style="background:' + getColor(from) + '"></i> ' +
+                            (to ? from + '&ndash;' + (to - 1) + '<br>' : from + '+');
+                    }
                 }
 
                 return div;
             };
+
 
             legend.addTo(map);
         </script>

@@ -135,10 +135,15 @@
                 for (var i = 0; i < grades.length; i++) {
                     var from = grades[i];
                     var to = grades[i + 1];
-
+                    if (i === 0) {
+                        div.innerHTML +=
+                            '<i style="background:' + getColor(from) + '"></i> ' +
+                            from + '<br>';
+                    } else {
                     div.innerHTML +=
                         '<i style="background:' + getColor(from) + '"></i> ' +
                         (to ? from + '&ndash;' + (to - 1) + '<br>' : from + '+');
+                    }
                 }
 
                 return div;
